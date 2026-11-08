@@ -1,0 +1,16 @@
+node_modules
+worker-configuration.d.ts
+dist
+.wrangler
+.dev.vars
+.env
+.env.*
+!.env.example
+!.dev.vars.example
+test-results
+playwright-report
+blob-report
+coverage
+*.tsbuildinfo
+.DS_Store
+agent-crew.tar.gz

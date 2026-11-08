@@ -1,0 +1,4 @@
+# Copy to .dev.vars for local live mode. Leave blank to stay in demo mode.
+# Never commit a real key. On Cloudflare, set it with:
+#   npx wrangler secret put GROQ_API_KEY
+GROQ_API_KEY=

@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Outfit", "Avenir Next", "Segoe UI", sans-serif;
+  --font-serif: "Fraunces", "Iowan Old Style", Palatino, Georgia, serif;
+  --color-ink: #101411;
+  --color-ink-2: #1a221e;
+  --color-panel: #17201c;
+  --color-line: #31403a;
+  --color-paper: #f3eee4;
+  --color-paper-2: #e5d9c6;
+  --color-muted: #9aada4;
+  --color-planner: #e6b15c;
+  --color-researcher: #6ec8c0;
+  --color-writer: #f3efe4;
+  --color-critic: #e07a6a;
+  --color-good: #9cbf8a;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(900px 420px at 0% -10%, rgba(230, 177, 92, 0.14), transparent 55%),
+    radial-gradient(800px 380px at 100% 0%, rgba(110, 200, 192, 0.1), transparent 50%),
+    var(--color-ink);
+  color: var(--color-paper);
+  font-family: var(--font-sans);
+}
+
+::selection {
+  background: #e6b15c;
+  color: #101411;
+}
+
+.lane-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #31403a transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

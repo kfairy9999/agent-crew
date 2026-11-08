@@ -1,0 +1,43 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "agent-crew",
+  "main": "src/worker/index.ts",
+  "compatibility_date": "2026-11-08",
+  "compatibility_flags": ["nodejs_compat"],
+  "upload_source_maps": true,
+  // API routes hit the Worker. Everything else is the Vite build, with SPA fallback.
+  "assets": {
+    "directory": "./dist/client",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"]
+  },
+  "observability": {
+    "enabled": true,
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 1
+    },
+    "traces": {
+      "enabled": true,
+      "head_sampling_rate": 1
+    }
+  },
+  "vars": {
+    "GROQ_BASE_URL": "https://api.groq.com/openai/v1",
+    "GROQ_MODEL": "qwen/qwen3.8-27b",
+    "LIVE_RATE_CAPACITY": "2",
+    "LIVE_RATE_WINDOW_MS": "600000",
+    "LIVE_GLOBAL_CAPACITY": "4",
+    "MAX_REVISIONS": "2",
+    "BUDGET_MAX_TOKENS": "8000",
+    "BUDGET_MAX_COST_USD": "0.05",
+    "PRICE_PROMPT_PER_MILLION": "0.29",
+    "PRICE_COMPLETION_PER_MILLION": "0.59"
+  },
+  // Names the Worker secret for `wrangler types`. Absence of the secret selects demo mode;
+  // it is not baked into the bundle. Set it with `wrangler secret put GROQ_API_KEY`.
+  "secrets": {
+    "required": ["GROQ_API_KEY"]
+  }
+}
