@@ -1,5 +1,7 @@
 # Agent Crew
 
+**Live demo: [https://agent-crew.kfairley9999.workers.dev](https://agent-crew.kfairley9999.workers.dev)** (demo mode: scripted agents over a fixed source set, no API key spent)
+
 A planner, a researcher, a writer, and a critic take one assignment and come back with a short brief you can check. You watch the handoffs while they work. The sources under the brief are the ones the researcher actually retrieved.
 
 This is a portfolio project by **Kevin Fairley** for agentic AI roles: a typed orchestration core, a streaming desk, and a demo that does not spend an API key.
