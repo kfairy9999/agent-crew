@@ -147,6 +147,10 @@ Config worth knowing:
 - `observability.logs` and `observability.traces` are on
 - Preview URLs on `workers.dev` are public unless you put Access in front of them
 
+## How it was built
+
+I designed and directed this project and built it with AI coding agents: I set the requirements (a shared blackboard, a critic that can only send a draft back twice, citations checked against what was actually retrieved, a hard token budget, and a keyless demo mode), reviewed the results, and drove the fixes.
+
 ## What I learned
 
 The interesting bugs were not in the prompts.
