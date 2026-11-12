@@ -37,7 +37,13 @@ export function useCrew() {
     controller?.abort();
   }, [controller]);
 
-  return { state, running, error, run, stop };
+  const restore = useCallback((board: Blackboard) => {
+    setError(null);
+    setRunning(false);
+    setState(board);
+  }, []);
+
+  return { state, running, error, run, stop, restore };
 }
 
 async function streamRun(

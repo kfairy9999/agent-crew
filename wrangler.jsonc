@@ -37,6 +37,11 @@
   },
   // Names the Worker secret for `wrangler types`. Absence of the secret selects demo mode;
   // it is not baked into the bundle. Set it with `wrangler secret put GROQ_API_KEY`.
+  // MONGODB_URI is intentionally not required. `secrets.required` makes a missing
+  // secret fail deploy, and wrangler dev only forwards secrets in this list.
+  // A deploy without MONGODB_URI stays on IndexedDB. Set the archive later with
+  // `wrangler secret put MONGODB_URI` (optional `MONGODB_DB_NAME`, default agent_crew).
+  // `npm run dev` reads both from `.dev.vars` even though they are not required here.
   "secrets": {
     "required": ["GROQ_API_KEY"]
   }

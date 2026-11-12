@@ -6,15 +6,20 @@ import { paceEvents, type Pace } from "../core/pace";
 import { TokenBucketLimiter } from "../core/rate-limit";
 import { runBodySchema } from "../core/schemas";
 import { PRESETS } from "../demo/presets";
+import { redactText } from "../persist/redact";
 import { FIXTURE_CORPUS, getFixture } from "../tools/corpus";
-import { readSettings, type WorkerBindings } from "./bindings";
+import { handleArchiveGet, handleArchiveList, handleArchivePut } from "./archive";
+import { mongoConfigured, readSettings, type WorkerBindings } from "./bindings";
 import { renderFixturePage } from "./fixture-page";
 import { limitersFor } from "./limiters";
+import { archiveFromEnv, type MongoConnector } from "./mongo";
 import { startCrew } from "./run";
 
 export interface AppOptions {
   limiters?: { ip: TokenBucketLimiter; global: TokenBucketLimiter };
   fetchImpl?: typeof fetch;
+  /** Test seam. Production uses the MongoDB driver only when `MONGODB_URI` is set. */
+  mongoConnect?: MongoConnector;
 }
 
 export function createApp(options: AppOptions = {}): Hono<{ Bindings: WorkerBindings }> {
@@ -24,7 +29,7 @@ export function createApp(options: AppOptions = {}): Hono<{ Bindings: WorkerBind
     console.error(
       JSON.stringify({
         message: "unhandled",
-        error: error instanceof Error ? error.message : String(error),
+        error: redactText(error instanceof Error ? error.message : String(error)),
       }),
     );
     return c.json({ error: "The desk hit an unexpected error.", code: "internal" }, 500);
@@ -48,9 +53,17 @@ export function createApp(options: AppOptions = {}): Hono<{ Bindings: WorkerBind
         globalRunsPerWindow: settings.globalCapacity,
         windowSeconds: Math.round(settings.liveWindowMs / 1000),
       },
+      archive: {
+        browser: "indexeddb",
+        server: mongoConfigured(c.env) ? "mongodb" : null,
+      },
       presets: PRESETS,
     });
   });
+
+  app.get("/api/archive/runs", (c) => handleArchiveList(c, archiveFromEnv(c.env, options.mongoConnect)));
+  app.get("/api/archive/runs/:id", (c) => handleArchiveGet(c, archiveFromEnv(c.env, options.mongoConnect)));
+  app.put("/api/archive/runs/:id", (c) => handleArchivePut(c, archiveFromEnv(c.env, options.mongoConnect)));
 
   app.get("/api/fixtures", (c) =>
     c.json(FIXTURE_CORPUS.map((doc) => ({ id: doc.id, title: doc.title }))),

@@ -25,6 +25,7 @@
     "src/llm/**/*.ts",
     "src/tools/**/*.ts",
     "src/demo/**/*.ts",
+    "src/persist/**/*.ts",
     "src/server/**/*.ts",
     "src/worker/**/*.ts",
     "vite.config.ts",

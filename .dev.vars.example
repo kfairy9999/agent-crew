@@ -2,3 +2,11 @@
 # Never commit a real key. On Cloudflare, set it with:
 #   npx wrangler secret put GROQ_API_KEY
 GROQ_API_KEY=
+
+# Optional run archive. Leave unset to keep runs in the browser (IndexedDB) only.
+# Never commit a real URI. A free Atlas M0 cluster is enough; this repo does not
+# provision one. `npm run dev` reads these. On Cloudflare, set them later with:
+#   npx wrangler secret put MONGODB_URI
+#   npx wrangler secret put MONGODB_DB_NAME
+# MONGODB_URI=
+# MONGODB_DB_NAME=agent_crew

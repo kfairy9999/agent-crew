@@ -2,7 +2,7 @@ import { serve } from "@hono/node-server";
 import { serveStatic } from "@hono/node-server/serve-static";
 import { existsSync, readFileSync } from "node:fs";
 import { createApp } from "../worker/app";
-import { BINDING_KEYS, isBindingKey, type WorkerBindings } from "../worker/bindings";
+import { BINDING_KEYS, isBindingKey, mongoConfigured, type WorkerBindings } from "../worker/bindings";
 
 const port = Number(process.env.PORT ?? 44731);
 const env = loadLocalEnv();
@@ -32,6 +32,7 @@ serve(
         port: info.port,
         static: process.env.SERVE_STATIC === "1",
         liveAvailable: Boolean(env.GROQ_API_KEY?.trim()),
+        archive: mongoConfigured(env) ? "mongodb" : "indexeddb",
       }),
     );
   },
