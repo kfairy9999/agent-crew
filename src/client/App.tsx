@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import { AGENTS, type RunMode } from "../core";
 import { PRESETS } from "../demo/presets";
+import { reopenedCopy } from "../persist/document";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Lane } from "./components/lane";
 import { ReportView } from "./components/report-view";
+import { SavedRuns } from "./components/saved-runs";
+import { useRunArchive } from "./lib/use-archive";
 import { useCrew } from "./lib/use-crew";
 
 interface PublicConfig {
@@ -14,14 +17,24 @@ interface PublicConfig {
   maxRevisions: number;
   budget: { maxTokens: number; maxCostUsd: number };
   rateLimit: { liveRunsPerWindow: number; windowSeconds: number };
+  archive: { browser: "indexeddb"; server: "mongodb" | null };
 }
 
 export function App() {
-  const { state, running, error, run, stop } = useCrew();
+  const { state, running, error, run, stop, restore } = useCrew();
   const [topic, setTopic] = useState("");
   const [mode, setMode] = useState<RunMode>("demo");
   const [config, setConfig] = useState<PublicConfig | null>(null);
   const [configError, setConfigError] = useState<string | null>(null);
+  const archive = useRunArchive({
+    state,
+    running,
+    remote: config ? config.archive?.server === "mongodb" : null,
+    onOpen: (record) => {
+      setTopic(record.topic);
+      restore(record.blackboard);
+    },
+  });
 
   useEffect(() => {
     const controller = new AbortController();
@@ -142,7 +155,7 @@ export function App() {
               size="sm"
               variant={mode === "live" ? "danger" : "secondary"}
               disabled={!liveAvailable}
-              title={liveAvailable ? "Calls Groq with the Worker secret. Rate limited." : "No GROQ_API_KEY on this desk."}
+              title={liveAvailable ? "Calls Groq. Rate limited." : "Live mode is off on this desk."}
               onClick={() => setMode("live")}
             >
               Live
@@ -166,6 +179,17 @@ export function App() {
             )}
           </div>
           {configError ? <p className="mt-3 text-xs text-critic">Could not read desk config. Demo still runs.</p> : null}
+          <SavedRuns
+            runs={archive.runs}
+            activeId={state.runId}
+            disabled={running}
+            ready={archive.ready}
+            remote={archive.remote}
+            storageError={archive.storageError}
+            remoteError={archive.remoteError}
+            saveError={archive.saveError}
+            onOpen={(id) => void archive.openRun(id)}
+          />
         </section>
 
         <section>
@@ -179,12 +203,19 @@ export function App() {
               {state.error}
             </p>
           ) : null}
+          {archive.reopened ? (
+            <p data-testid="reopened-run" className="mb-3 rounded-md border border-planner/50 bg-planner/10 px-3 py-2 text-sm text-paper">
+              {reopenedCopy(state)}
+            </p>
+          ) : null}
           <p data-testid="handoff" className="mb-3 min-h-6 text-sm leading-relaxed text-muted">
             {handoff && handoff.type === "handoff"
               ? `${handoff.from} → ${handoff.to} · ${handoff.note}`
               : running
                 ? "Opening the desk…"
-                : "No handoff yet. The crew waits for an assignment."}
+                : archive.reopened
+                  ? "Saved snapshot. The crew is not running."
+                  : "No handoff yet. The crew waits for an assignment."}
           </p>
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
             {AGENTS.map((agent) => (
@@ -202,7 +233,7 @@ export function App() {
       </main>
       <footer className="mx-auto max-w-[1440px] px-4 pb-8 text-xs text-muted">
         MIT licensed. The orchestration core — messages, blackboard, critic cap, token budget — is tested without a
-        network.
+        network. A refresh reopens saved runs from this browser.
       </footer>
     </div>
   );

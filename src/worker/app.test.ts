@@ -12,10 +12,16 @@ describe("API", () => {
     expect(await health.json()).toEqual({ ok: true });
 
     const config = await app.request("http://local/api/config");
-    const body = (await config.json()) as { liveAvailable: boolean; model: string; demoDefault: boolean };
+    const body = (await config.json()) as {
+      liveAvailable: boolean;
+      model: string;
+      demoDefault: boolean;
+      archive: { browser: string; server: string | null };
+    };
     expect(body.liveAvailable).toBe(false);
     expect(body.demoDefault).toBe(true);
     expect(body.model).toBe("qwen/qwen3.8-27b");
+    expect(body.archive).toEqual({ browser: "indexeddb", server: null });
 
     const page = await app.request("http://local/api/fixtures/blackboard", {
       headers: { accept: "text/html" },

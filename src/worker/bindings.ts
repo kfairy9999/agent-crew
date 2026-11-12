@@ -14,6 +14,10 @@ export interface WorkerBindings {
   BUDGET_MAX_COST_USD?: string;
   PRICE_PROMPT_PER_MILLION?: string;
   PRICE_COMPLETION_PER_MILLION?: string;
+  /** Optional. Unset keeps runs in the browser. Never log this value. */
+  MONGODB_URI?: string;
+  /** Optional database name. Defaults to `agent_crew`. */
+  MONGODB_DB_NAME?: string;
 }
 
 export const BINDING_KEYS = [
@@ -28,6 +32,8 @@ export const BINDING_KEYS = [
   "BUDGET_MAX_COST_USD",
   "PRICE_PROMPT_PER_MILLION",
   "PRICE_COMPLETION_PER_MILLION",
+  "MONGODB_URI",
+  "MONGODB_DB_NAME",
 ] as const satisfies readonly (keyof WorkerBindings)[];
 
 export interface Settings {
@@ -70,6 +76,17 @@ export function readSettings(env: WorkerBindings | undefined): Settings {
 
 export function isBindingKey(key: string): key is keyof WorkerBindings {
   return (BINDING_KEYS as readonly string[]).includes(key);
+}
+
+const DB_NAME = /^[A-Za-z0-9_-]{1,64}$/;
+
+export function mongoConfigured(env: WorkerBindings | undefined): boolean {
+  return Boolean(env?.MONGODB_URI?.trim());
+}
+
+export function mongoDbName(env: WorkerBindings | undefined): string {
+  const name = env?.MONGODB_DB_NAME?.trim() ?? "";
+  return DB_NAME.test(name) ? name : "agent_crew";
 }
 
 function positiveInt(value: string | undefined, fallback: number): number {

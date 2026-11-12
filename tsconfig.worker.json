@@ -20,7 +20,8 @@
     "src/core/**/*.ts",
     "src/llm/**/*.ts",
     "src/tools/**/*.ts",
-    "src/demo/**/*.ts"
+    "src/demo/**/*.ts",
+    "src/persist/**/*.ts"
   ],
   "exclude": ["src/**/*.test.ts"]
 }
